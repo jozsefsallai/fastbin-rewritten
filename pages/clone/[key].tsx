@@ -10,6 +10,7 @@ import { useToasts } from '@geist-ui/react';
 import LoadingContainer from '@/components/loading-container/LoadingContainer';
 import Mousetrap from 'mousetrap';
 import globalKeyBind from '@/lib/globalKeyBind';
+import { useRouter } from 'next/router';
 
 interface ClonePageProps {
   contents: string;
@@ -22,8 +23,13 @@ const ClonePage = ({ contents, languageId }: ClonePageProps) => {
   const [ uploading, setUploading ] = useState(false);
 
   const [ toasts, setToast ] = useToasts();
+  const router = useRouter();
 
   const save = async () => {
+    if (uploading) {
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -32,11 +38,11 @@ const ClonePage = ({ contents, languageId }: ClonePageProps) => {
       setUploading(false);
 
       setToast({
-        text: 'Snippet created successfully!' + ' ' + key,
+        text: 'Snippet created successfully!',
         type: 'success'
       });
 
-      console.log(key);
+      router.push(`/${key}`);
     } catch (err) {
       setUploading(false);
 
@@ -56,14 +62,20 @@ const ClonePage = ({ contents, languageId }: ClonePageProps) => {
   ];
 
   useEffect(() => {
+    let mounted = true;
     globalKeyBind(Mousetrap);
 
-    Mousetrap.bindGlobal('ctrl+s', async e => {
+    Mousetrap.bindGlobal('ctrl+s', e => {
       e.preventDefault();
-      await save();
+      if (mounted) {
+        save();
+      }
     });
 
-    return () => (Mousetrap as any).unbindGlobal('ctrl+s');
+    return () => {
+      (Mousetrap as any).unbindGlobal('ctrl+s');
+      mounted = false;
+    };
   }, []);
 
   return (

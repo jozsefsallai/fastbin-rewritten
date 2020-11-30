@@ -6,7 +6,6 @@ import FirebaseStorageStrategy from './FirebaseStorageStrategy';
 
 const getStorageStrategy = () => {
   const strategy = env('storage-strategy');
-  console.log(strategy);
 
   switch (strategy) {
     case 'file':

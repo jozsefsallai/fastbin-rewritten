@@ -19,6 +19,10 @@ const Home = () => {
   const router = useRouter();
 
   const save = async () => {
+    if (uploading) {
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -27,7 +31,7 @@ const Home = () => {
       setUploading(false);
 
       setToast({
-        text: 'Snippet created successfully!' + ' ' + key,
+        text: 'Snippet created successfully!',
         type: 'success'
       });
 
@@ -51,14 +55,20 @@ const Home = () => {
   ];
 
   useEffect(() => {
+    let mounted = true;
     globalKeyBind(Mousetrap);
 
-    Mousetrap.bindGlobal('ctrl+s', async e => {
+    Mousetrap.bindGlobal('ctrl+s', e => {
       e.preventDefault();
-      await save();
+      if (mounted) {
+        save();
+      }
     });
 
-    return () => (Mousetrap as any).unbindGlobal('ctrl+s');
+    return () => {
+      (Mousetrap as any).unbindGlobal('ctrl+s');
+      mounted = false;
+    };
   }, []);
 
   return (

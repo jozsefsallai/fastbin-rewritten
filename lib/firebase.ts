@@ -27,10 +27,10 @@ const getCredentials = () => {
 
 const initFirebaseStorage = () => {
   if (firebase.apps.length === 0) {
-    const credential = getCredentials();
+    const credentials = getCredentials();
 
     firebase.initializeApp({
-      credential
+      credential: firebase.credential.cert(credentials)
     });
   }
 
