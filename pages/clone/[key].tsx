@@ -4,7 +4,7 @@ import { Save } from '@geist-ui/react-icons';
 import env from '@/lib/env';
 import languages from '@/lib/languages';
 import EditorWrapper from '@/components/editor-wrapper/EditorWrapper';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import upload from '@/lib/upload';
 import { useToasts } from '@geist-ui/react';
 import LoadingContainer from '@/components/loading-container/LoadingContainer';
@@ -19,8 +19,10 @@ interface ClonePageProps {
 
 const ClonePage = ({ contents, languageId }: ClonePageProps) => {
   const [ documentLanguage, setDocumentLanguage ] = useState(languageId);
-  const [ documentContents, setDocumentContents ] = useState(contents);
   const [ uploading, setUploading ] = useState(false);
+
+  const documentContents = useRef(contents);
+  const setDocumentContents = (c: string) => documentContents.current = c;
 
   const [ toasts, setToast ] = useToasts();
   const router = useRouter();
@@ -33,7 +35,7 @@ const ClonePage = ({ contents, languageId }: ClonePageProps) => {
     setUploading(true);
 
     try {
-      const key = await upload(documentContents, documentLanguage);
+      const key = await upload(documentContents.current, documentLanguage);
 
       setUploading(false);
 
@@ -85,7 +87,7 @@ const ClonePage = ({ contents, languageId }: ClonePageProps) => {
       setDocumentLanguage={setDocumentLanguage}
     >
       <EditorWrapper
-        contents={documentContents}
+        contents={documentContents.current}
         setContents={setDocumentContents}
         language={documentLanguage}
       />

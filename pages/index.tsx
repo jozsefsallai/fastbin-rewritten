@@ -1,7 +1,7 @@
 import { NavigationItem } from '@/components/the-header/TheHeader';
 import { Save } from '@geist-ui/react-icons';
 import AppTemplate from '@/components/AppTemplate';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import EditorWrapper from '@/components/editor-wrapper/EditorWrapper';
 import upload from '@/lib/upload';
 import { useToasts } from '@geist-ui/react';
@@ -12,7 +12,10 @@ import globalKeyBind from '@/lib/globalKeyBind';
 
 const Home = () => {
   const [ documentLanguage, setDocumentLanguage ] = useState('plain');
-  const [ contents, setContents ] = useState('');
+
+  const contents = useRef('');
+  const setContents = (c: string) => contents.current = c;
+
   const [ uploading, setUploading ] = useState(false);
 
   const [ toasts, setToast ] = useToasts();
@@ -26,7 +29,7 @@ const Home = () => {
     setUploading(true);
 
     try {
-      const key = await upload(contents, documentLanguage);
+      const key = await upload(contents.current, documentLanguage);
 
       setUploading(false);
 
@@ -78,7 +81,7 @@ const Home = () => {
       setDocumentLanguage={setDocumentLanguage}
     >
       <EditorWrapper
-        contents={contents}
+        contents={contents.current}
         setContents={setContents}
         language={documentLanguage}
       />
