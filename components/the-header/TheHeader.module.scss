@@ -1,0 +1,39 @@
+.wrapper {
+  padding: 0 2em;
+
+  .sitename {
+    width: auto;
+
+    h1 {
+      font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+      font-size: 24px;
+      font-weight: normal;
+      margin: 0;
+      padding: 0;
+    }
+
+    @media only screen and ( max-width: 530px ) {
+      display: none;
+    }
+  }
+
+  .navItem {
+    margin-right: 0.5em;
+
+    a {
+      color: #fff;
+    }
+
+    &:hover {
+      opacity: .8;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    svg {
+      cursor: pointer;
+    }
+  }
+}
