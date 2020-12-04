@@ -86,6 +86,7 @@ const EditorPage = ({ contents, languageId }: EditorPageProps) => {
     <AppTemplate
       navigation={navigation}
       displayLanguages
+      documentLanguage={documentLanguage}
       setDocumentLanguage={setDocumentLanguage}
     >
       <Editor
