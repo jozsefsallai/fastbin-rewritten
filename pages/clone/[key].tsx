@@ -18,7 +18,13 @@ interface ClonePageProps {
 }
 
 const ClonePage = ({ contents, languageId }: ClonePageProps) => {
-  const [ documentLanguage, setDocumentLanguage ] = useState(languageId);
+  const [ documentLanguage, _setDocumentLanguage ] = useState(languageId);
+  const documentLanguageRef = useRef(languageId);
+  const setDocumentLanguage = (l: string) => {
+    _setDocumentLanguage(l);
+    documentLanguageRef.current = l;
+  };
+
   const [ uploading, setUploading ] = useState(false);
 
   const documentContents = useRef(contents);
@@ -37,10 +43,8 @@ const ClonePage = ({ contents, languageId }: ClonePageProps) => {
     try {
       const key = await upload(documentContents.current, documentLanguage);
 
-      setUploading(false);
-
       setToast({
-        text: 'Snippet created successfully!',
+        text: 'Snippet created successfully! Redirecting...',
         type: 'success'
       });
 

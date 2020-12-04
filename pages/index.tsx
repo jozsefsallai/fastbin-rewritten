@@ -11,7 +11,12 @@ import Mousetrap from 'mousetrap';
 import globalKeyBind from '@/lib/globalKeyBind';
 
 const Home = () => {
-  const [ documentLanguage, setDocumentLanguage ] = useState('plain');
+  const [ documentLanguage, _setDocumentLanguage ] = useState('plain');
+  const documentLanguageRef = useRef('plain');
+  const setDocumentLanguage = (l: string) => {
+    _setDocumentLanguage(l);
+    documentLanguageRef.current = l;
+  };
 
   const contents = useRef('');
   const setContents = (c: string) => contents.current = c;
@@ -29,12 +34,10 @@ const Home = () => {
     setUploading(true);
 
     try {
-      const key = await upload(contents.current, documentLanguage);
-
-      setUploading(false);
+      const key = await upload(contents.current, documentLanguageRef.current);
 
       setToast({
-        text: 'Snippet created successfully!',
+        text: 'Snippet created successfully! Redirecting...',
         type: 'success'
       });
 
