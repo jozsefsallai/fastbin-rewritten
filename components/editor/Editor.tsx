@@ -1,13 +1,13 @@
-import { ControlledEditor as Editor } from '@monaco-editor/react';
+import { ControlledEditor } from '@monaco-editor/react';
 
-export interface EditorWrapperOpts {
+export interface EditorOpts {
   contents?: string;
   readonly?: boolean;
   language: string;
   setContents(contents: string): any;
 }
 
-const EditorWrapper = ({ contents, readonly, language, setContents }: EditorWrapperOpts) => {
+const Editor = ({ contents, readonly, language, setContents }: EditorOpts) => {
   const editorOptions = {
     fontFamily: '"Fira Code", "Consolas", "Courier New", monospace',
     fontLigatures: true,
@@ -18,7 +18,7 @@ const EditorWrapper = ({ contents, readonly, language, setContents }: EditorWrap
   const handleEditorChange = (_, value) => setContents(value);
 
   return (
-    <Editor
+    <ControlledEditor
       language={language}
       value={contents}
       onChange={handleEditorChange}
@@ -29,4 +29,4 @@ const EditorWrapper = ({ contents, readonly, language, setContents }: EditorWrap
   );
 };
 
-export default EditorWrapper;
+export default Editor;
