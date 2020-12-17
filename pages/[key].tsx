@@ -101,7 +101,7 @@ export async function getServerSideProps({ req, res, params }) {
     res.statusCode = 302;
     res.end();
 
-    return;
+    return { props: {} }; // We have to return something, or else Next.js will be mad.
   }
 
   const baseUrl = env('site-url', true);
