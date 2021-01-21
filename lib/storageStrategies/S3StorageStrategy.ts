@@ -17,6 +17,10 @@ class S3StorageStrategy implements IStorageStrategy {
   async exists(key) {
     return new S3().exists(key);
   }
+
+  async delete(key) {
+    return new S3().delete(key);
+  }
 }
 
 export default S3StorageStrategy;

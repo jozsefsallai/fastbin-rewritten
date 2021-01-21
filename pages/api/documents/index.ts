@@ -3,6 +3,7 @@ import { getStorageStrategy } from '@/lib/storageStrategies';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import cuid from 'cuid';
+import { encrypt } from '@/lib/secrets';
 
 const storage = getStorageStrategy();
 
@@ -51,7 +52,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     await storage.create({ key, contents });
 
-    return res.json({ ok: true, key });
+    const secret = encrypt('id', key);
+
+    return res.json({ ok: true, key, secret });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ ok: false });

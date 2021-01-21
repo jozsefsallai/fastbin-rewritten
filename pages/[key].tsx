@@ -3,7 +3,7 @@ import AppTemplate from '@/components/AppTemplate';
 import { NavigationItem } from '@/components/the-header/TheHeader';
 import env from '@/lib/env';
 import languages from '@/lib/languages';
-import { Copy, Code } from '@geist-ui/react-icons';
+import { Copy, Code, Trash2 } from '@geist-ui/react-icons';
 import { ControlledEditor as Editor } from '@monaco-editor/react';
 import Mousetrap from 'mousetrap';
 import { useRouter } from 'next/router';
@@ -15,9 +15,10 @@ interface DocumentPageProps {
   finalKey: string;
   originalKey: string;
   languageId: string;
+  secret: string | null;
 }
 
-const DocumentPage = ({ contents, finalKey, originalKey, languageId }: DocumentPageProps) => {
+const DocumentPage = ({ contents, finalKey, originalKey, languageId, secret }: DocumentPageProps) => {
   const navigation: NavigationItem[] = [
     {
       tooltip: 'Clone (ctrl+shift+c)',
@@ -31,6 +32,14 @@ const DocumentPage = ({ contents, finalKey, originalKey, languageId }: DocumentP
       icon: Code
     }
   ];
+
+  if (secret) {
+    navigation.push({
+      tooltip: 'Delete',
+      url: `/delete/${secret}`,
+      icon: Trash2
+    })
+  }
 
   const editorOptions = {
     fontFamily: '"Fira Code", "Consolas", "Courier New", monospace',
@@ -75,7 +84,7 @@ const DocumentPage = ({ contents, finalKey, originalKey, languageId }: DocumentP
 
 export default DocumentPage;
 
-export async function getServerSideProps({ req, res, params }) {
+export async function getServerSideProps({ req, res, params, query }) {
   let key = params.key;
   let originalKey = key;
 
@@ -124,12 +133,15 @@ export async function getServerSideProps({ req, res, params }) {
 
   const contents = json.contents;
 
+  const secret: string | null = query.secret || null;
+
   return {
     props: {
       contents,
       finalKey: key,
       originalKey,
-      languageId
+      languageId,
+      secret
     }
   };
 };

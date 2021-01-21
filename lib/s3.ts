@@ -82,6 +82,23 @@ class S3 {
       });
     });
   }
+
+  delete(key: string): Promise<any> {
+    const params = {
+      Bucket: env('s3.bucket'),
+      Key: key
+    };
+
+    return new Promise((resolve, reject) => {
+      return this.s3.deleteObject(params, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(data);
+      });
+    });
+  }
 }
 
 export default S3;

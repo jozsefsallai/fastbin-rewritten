@@ -20,6 +20,10 @@ append ".js" to the end of the URL and it will highlight it as JavaScript.
 Appending .js to the raw URL will obviously not work, it expects only the key to
 be provided.
 
+Once you create a snippet, you will be given a link that you can use to delete
+it from fastbin. This link will only ever be displayed ONCE, so make sure to
+save it somewhere safe in case you want to delete your snippet later.
+
 ## fastbin cli
 
 fastbin now has its own command line client. It's available for Linux, Mac OS,

@@ -24,6 +24,10 @@ class FileStorageStrategy implements IStorageStrategy {
   async exists(key) {
     return fs.pathExists(path.join(STORAGE_ROOT, key));
   }
+
+  async delete(key) {
+    return fs.unlink(path.join(STORAGE_ROOT, key));
+  }
 }
 
 export default FileStorageStrategy;

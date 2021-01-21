@@ -81,6 +81,16 @@ class Firebase {
         .catch(reject);
     });
   }
+
+  delete(key: string): Promise<any> {
+    const file = this.storage.file(key);
+
+    return new Promise((resolve, reject) => {
+      file.delete()
+        .then(resolve)
+        .catch(reject);
+    });
+  }
 }
 
 export default Firebase;

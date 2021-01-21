@@ -1,5 +1,10 @@
 import languages from './languages';
 
+interface KeyAndSecret {
+  key: string;
+  secret: string;
+}
+
 const getKeyWithExtension = (key: string, languageId: string): string => {
   if (languageId === 'plain') {
     return key;
@@ -14,7 +19,7 @@ const getKeyWithExtension = (key: string, languageId: string): string => {
   return `${key}.${targetLanguage.extension}`;
 };
 
-const upload = (contents: string, languageId: string): Promise<string> => {
+const upload = (contents: string, languageId: string): Promise<KeyAndSecret> => {
   return new Promise((resolve, reject) => {
     if (!contents.length) {
       return reject('Contents is too short.');
@@ -33,7 +38,10 @@ const upload = (contents: string, languageId: string): Promise<string> => {
       .then(json => {
         if (json.ok) {
           const key = getKeyWithExtension(json.key, languageId);
-          return resolve(key);
+          return resolve({
+            key,
+            secret: json.secret
+          });
         } else {
           return reject(json.error);
         }
