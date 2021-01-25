@@ -1,25 +1,16 @@
 import AppTemplate from '@/components/AppTemplate';
-import { ControlledEditor as Editor } from '@monaco-editor/react';
+import Editor from '@/components/editor/Editor';
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
 const About = ({ readme }: { readme: string }) => {
-  const editorOptions = {
-    fontFamily: '"Fira Code", "Consolas", "Courier New", monospace',
-    fontLigatures: true,
-    lineHeight: 22,
-    readOnly: true
-  };
-
   return (
     <AppTemplate navigation={[]}>
       <Editor
         language="markdown"
-        value={readme}
-        theme="dark"
-        wrapperClassName="editor"
-        options={editorOptions}
+        contents={readme}
+        readOnly
       />
     </AppTemplate>
   );

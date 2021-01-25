@@ -1,5 +1,7 @@
 @import './fonts';
 
+$background-color: #202124;
+
 html,
 body {
   padding: 0;
@@ -8,7 +10,7 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 
   // currently a very hacky workaround but it works so I don't care
-  background: #202124 !important;
+  background: $background-color !important;
 }
 
 .editor {
@@ -17,4 +19,16 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+textarea.editor {
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  line-height: 22px;
+  font-family: "Fira Code", "Consolas", "Courier New", monospace;
 }

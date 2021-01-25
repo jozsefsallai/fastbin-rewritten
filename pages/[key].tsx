@@ -1,10 +1,9 @@
-import device from 'device';
 import AppTemplate from '@/components/AppTemplate';
 import { NavigationItem } from '@/components/the-header/TheHeader';
 import env from '@/lib/env';
 import languages from '@/lib/languages';
 import { Copy, Code, Trash2 } from '@geist-ui/react-icons';
-import { ControlledEditor as Editor } from '@monaco-editor/react';
+import Editor from '@/components/editor/Editor';
 import Mousetrap from 'mousetrap';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -41,13 +40,6 @@ const DocumentPage = ({ contents, finalKey, originalKey, languageId, secret }: D
     })
   }
 
-  const editorOptions = {
-    fontFamily: '"Fira Code", "Consolas", "Courier New", monospace',
-    fontLigatures: true,
-    lineHeight: 22,
-    readOnly: true
-  };
-
   const router = useRouter();
 
   useEffect(() => {
@@ -73,10 +65,8 @@ const DocumentPage = ({ contents, finalKey, originalKey, languageId, secret }: D
     <AppTemplate navigation={navigation}>
       <Editor
         language={languageId}
-        value={contents}
-        theme="dark"
-        wrapperClassName="editor"
-        options={editorOptions}
+        contents={contents}
+        readOnly
       />
     </AppTemplate>
   );
@@ -101,16 +91,6 @@ export async function getServerSideProps({ req, res, params, query }) {
     if (targetLanguage) {
       languageId = targetLanguage.id;
     }
-  }
-
-  const userDevice = device(req.headers['user-agent']);
-
-  if (userDevice.is('phone') || userDevice.is('tablet')) {
-    res.setHeader('Location', `/raw/${key}`);
-    res.statusCode = 302;
-    res.end();
-
-    return { props: {} }; // We have to return something, or else Next.js will be mad.
   }
 
   const baseUrl = env('site-url', true);

@@ -49,10 +49,10 @@ const TheHeader = ({
           <h1>fastbin<sup><small><strong>v2</strong></small></sup></h1>
         </Col>
 
-        <Col style={{ width: 'auto' }}>
+        <Col className={css.navigationWrapper}>
           <Row align="middle" gap={.8}>
             {displayLanguages && (
-              <Col>
+              <Col className={css.languageRow}>
                 <Select initialValue={documentLanguage || 'plain'} onChange={setDocumentLanguage}>
                   {Object.keys(languages).map(id => {
                     const language = languages[id];

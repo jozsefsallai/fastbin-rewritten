@@ -1,5 +1,5 @@
 import AppTemplate from '@/components/AppTemplate';
-import { ControlledEditor as Editor } from '@monaco-editor/react';
+import Editor from '@/components/editor/Editor';
 
 const ERROR_PAGE = `# Error 404
 
@@ -11,21 +11,12 @@ contact me on GitHub: https://github.com/jozsefsallai
 `;
 
 const NotFound = () => {
-  const editorOptions = {
-    fontFamily: '"Fira Code", "Consolas", "Courier New", monospace',
-    fontLigatures: true,
-    lineHeight: 22,
-    readOnly: true
-  };
-
   return (
     <AppTemplate navigation={[]}>
       <Editor
         language="markdown"
-        value={ERROR_PAGE}
-        theme="dark"
-        wrapperClassName="editor"
-        options={editorOptions}
+        contents={ERROR_PAGE}
+        readOnly
       />
     </AppTemplate>
   );
