@@ -45,19 +45,16 @@ const TheHeader = ({
     ...items
   ];
 
-  const [ headerClasses, setHeaderClasses ] = useState(css.wrapper);
+  const [ headerClasses, setHeaderClasses ] = useState([ css.wrapper, css.mobileHeader ].join(' '));
   const [ tooltipPlacement, setTooltipPlacement ] = useState<'bottom' | 'top'>('bottom');
 
   useEffect(() => {
     const isMobile = checkMobile(window.navigator).any;
 
     if (isMobile) {
-      setHeaderClasses([
-        css.wrapper,
-        css.mobileHeader
-      ].join(' '));
-
       setTooltipPlacement('top');
+    } else {
+      setHeaderClasses(css.wrapper);
     }
   }, []);
 
