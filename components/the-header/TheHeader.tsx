@@ -6,6 +6,9 @@ import Link from 'next/link';
 
 import languages from '@/lib/languages';
 
+import { useState, useEffect } from 'react';
+import checkMobile from 'ismobilejs';
+
 export interface NavigationItem {
   url?: string;
   external?: boolean;
@@ -42,8 +45,24 @@ const TheHeader = ({
     ...items
   ];
 
+  const [ headerClasses, setHeaderClasses ] = useState(css.wrapper);
+  const [ tooltipPlacement, setTooltipPlacement ] = useState<'bottom' | 'top'>('bottom');
+
+  useEffect(() => {
+    const isMobile = checkMobile(window.navigator).any;
+
+    if (isMobile) {
+      setHeaderClasses([
+        css.wrapper,
+        css.mobileHeader
+      ].join(' '));
+
+      setTooltipPlacement('top');
+    }
+  }, []);
+
   return (
-    <header className={css.wrapper}>
+    <header className={headerClasses}>
       <Row align="middle" justify="space-between" style={{ height: '65px' }}>
         <Col style={{ width: 'auto' }} className={css.sitename}>
           <h1>fastbin<sup><small><strong>v2</strong></small></sup></h1>
@@ -72,7 +91,7 @@ const TheHeader = ({
 
             <Col>
               {navigationItems.map((item, idx) => (
-                <Tooltip key={idx} text={item.tooltip} placement="bottom" className={css.navItem}>
+                <Tooltip key={idx} text={item.tooltip} placement={tooltipPlacement} className={css.navItem}>
                   {item.url && !item.external && <Link href={item.url}>
                     <a>
                       <item.icon size={36} />

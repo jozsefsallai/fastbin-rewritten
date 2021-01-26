@@ -31,4 +31,10 @@ textarea.editor {
   padding: 10px;
   line-height: 22px;
   font-family: "Fira Code", "Consolas", "Courier New", monospace;
+  resize: none;
+
+  @media only screen and ( max-width: 530px ) {
+    top: 0;
+    bottom: 65px;
+  }
 }
