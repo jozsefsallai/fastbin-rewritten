@@ -8,26 +8,28 @@
     "project": "tsconfig.json",
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint/eslint-plugin"
-  ],
+  "extends": ["plugin:@next/next/recommended"],
+  "plugins": ["@typescript-eslint/eslint-plugin"],
   "rules": {
-    "@typescript-eslint/indent": [ "error", 2 ],
-    "@typescript-eslint/member-delimiter-style": [ "error", {
-      "multiline": {
-        "delimiter": "semi",
-        "requireLast": true
-      },
+    "@typescript-eslint/indent": ["error", 2],
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "semi",
+          "requireLast": true
+        },
 
-      "singleline": {
-        "delimiter": "semi",
-        "requireLast": false
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": false
+        }
       }
-    } ],
+    ],
     "@typescript-eslint/no-unused-expressions": "error",
-    "@typescript-eslint/semi": [ "error", "always" ],
+    "@typescript-eslint/semi": ["error", "always"],
     "curly": "error",
-    "eqeqeq": [ "error", "always" ],
+    "eqeqeq": ["error", "always"],
     "no-redeclare": "error",
     "no-throw-literal": "error"
   }

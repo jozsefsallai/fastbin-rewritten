@@ -37,7 +37,7 @@ const DocumentPage = ({ contents, finalKey, originalKey, languageId, secret }: D
       tooltip: 'Delete',
       url: `/delete/${secret}`,
       icon: Trash2
-    })
+    });
   }
 
   const router = useRouter();
