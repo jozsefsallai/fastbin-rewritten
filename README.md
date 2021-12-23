@@ -62,6 +62,15 @@ Once the project is created, you must specify the environment variables that are
 necessary for the storage strategies to work. This is the same as creating a
 .env file in the manual setup.
 
+### One-Click Deployment with Netlify
+
+fastbin will work nicely on [Netlify](https://www.netlify.com) as well. It's one
+click away:
+
+<a href="https://app.netlify.com/start/deploy?repository=https://github.com/jozsefsallai/fastbin-rewritten"><img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify" /></a>
+
+Don't forget to specify the environment variables for your Netlify project.
+
 ### Manual Setup
 
 **1. Clone the repository**
@@ -119,14 +128,14 @@ bucket name using the `S3_*` environment variables.
 
 ### FirebaseStorageStrategy
 
-You need to specify the name of the Firebase Storage bucket* inside of the
+You need to specify the name of the Firebase Storage bucket\* inside of the
 `FIREBASE_BUCKET` property of the config. You should also include your Firebase
 credentials certificate in `.firebase/credentials.json` (or as an environment
 variable, using `FIREBASE_SERVICE_ACCOUNT`). This step is cruial. If you don't
 have a credentials JSON file yet, you can generate one in the settings of your
 Firebase projects.
 
-*Make sure you only specify the bucket's name, WITHOUT ".appspot.com".
+\*Make sure you only specify the bucket's name, WITHOUT ".appspot.com".
 
 ## Contribution
 
