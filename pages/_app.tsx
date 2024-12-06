@@ -17,8 +17,9 @@ const Fastbin = ({ Component, pageProps }) => {
     globalKeyBind(Mousetrap);
     Mousetrap.bindGlobal('ctrl+i', () => router.push('/'));
 
-    monaco.init()
-      .then(instance => {
+    monaco
+      .init()
+      .then((instance) => {
         instance.languages.register({ id: 'tsc' });
         instance.languages.setMonarchTokensProvider('tsc', {
           tokenizer: {
@@ -33,21 +34,34 @@ const Fastbin = ({ Component, pageProps }) => {
               [/[V0-9][0-9]{3}/, 'attribute.value'],
 
               // comments
-              [/\/\/.+/, 'comment']
-            ]
-          }
+              [/\/\/.+/, 'comment'],
+            ],
+          },
         });
 
         instance.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
           noSemanticValidation: true,
           noSyntaxValidation: true,
-          noSuggestionDiagnostics: true
+          noSuggestionDiagnostics: true,
         });
       })
       .catch(console.error);
 
     return () => {
       (Mousetrap as any).unbindGlobal('ctrl+i');
+    };
+  }, []);
+
+  // prevent user from instantly leaving if they close/refresh/move away from the page
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
 
@@ -63,7 +77,10 @@ const Fastbin = ({ Component, pageProps }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <meta name="title" content="fastbin" />
-        <meta name="description" content="free, fast, and easy pastebin service" />
+        <meta
+          name="description"
+          content="free, fast, and easy pastebin service"
+        />
       </Head>
     </GeistProvider>
   );
