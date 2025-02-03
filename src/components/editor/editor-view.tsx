@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { useHotkeys } from "react-hotkeys-hook";
 import { Editor } from "@/components/editor/editor";
+import { LoadingContainer } from "@/components/common/loading-container";
 
 export type EditorViewProps = {
   contents?: string;
@@ -155,12 +156,16 @@ export function EditorView({
         setDocumentLanguage={setDocumentLanguage}
       />
 
-      <Editor
-        contents={contents}
-        language={documentLanguage}
-        setContents={setDocumentContents}
-        readOnly={readOnly}
-      />
+      {!isUploading && (
+        <Editor
+          contents={contents}
+          language={documentLanguage}
+          setContents={setDocumentContents}
+          readOnly={readOnly}
+        />
+      )}
+
+      {isUploading && <LoadingContainer />}
     </main>
   );
 }

@@ -74,4 +74,9 @@ body {
   .editor {
     @apply fixed top-16 left-0 right-0 bottom-0;
   }
+
+  ::selection {
+    background: #137;
+    color: #fff;
+  }
 }

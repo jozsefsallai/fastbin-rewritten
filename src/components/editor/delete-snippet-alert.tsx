@@ -9,10 +9,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export type DeleteSnippetAlertProps = {
@@ -24,8 +23,6 @@ export function DeleteSnippetAlert({
   snippetKey,
   token,
 }: DeleteSnippetAlertProps) {
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
   const [requestInProgress, setRequestInProgress] = useState(false);
 
   const router = useRouter();
@@ -59,15 +56,8 @@ export function DeleteSnippetAlert({
     }
   }
 
-  useEffect(() => {
-    if (triggerRef.current) {
-      triggerRef.current.click();
-    }
-  }, []);
-
   return (
-    <AlertDialog>
-      <AlertDialogTrigger ref={triggerRef} />
+    <AlertDialog defaultOpen={true}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Snippet?</AlertDialogTitle>
