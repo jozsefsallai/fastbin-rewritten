@@ -56,8 +56,8 @@ export function TheHeader({
   ];
 
   return (
-    <header className="flex items-center justify-between py-4 px-8 h-16">
-      <div className="font-mono text-2xl">
+    <header className="fixed z-50 bottom-0 md:top-0 left-0 right-0 flex items-center justify-center md:justify-between py-4 px-8 h-16 border-t">
+      <div className="hidden md:block font-mono text-2xl">
         fastbin
         <sup>
           <small>v3</small>
@@ -69,7 +69,7 @@ export function TheHeader({
 
         {displayLanguages && (
           <Select value={documentLanguage} onValueChange={setDocumentLanguage}>
-            <SelectTrigger className="w-64">
+            <SelectTrigger className="w-64 hidden md:flex">
               {(documentLanguage
                 ? Object.values(languages).find(
                     (l) => l.id === documentLanguage,

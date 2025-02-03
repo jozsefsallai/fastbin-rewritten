@@ -72,7 +72,7 @@ body {
   }
 
   .editor {
-    @apply fixed top-16 left-0 right-0 bottom-0;
+    @apply fixed top-0 md:top-16 left-0 right-0 bottom-16 md:bottom-0;
   }
 
   ::selection {

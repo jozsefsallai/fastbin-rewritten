@@ -24,7 +24,7 @@ export function MobileEditor({
 
   return (
     <Textarea
-      className="editor"
+      className="editor rounded-none outline-none resize-none focus-visible:ring-0 text-base font-mono"
       onChange={handleEditorChange}
       readOnly={readOnly}
       spellCheck={false}
