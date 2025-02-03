@@ -110,9 +110,9 @@ yarn start
 ## Storage Strategies
 
 At the moment, fastbin can store snippets using three different strategies:
-`file`, `s3`, `firebase`. You can specify which one you want to use by changing
-the value of the `STORAGE_STRATEGY` environment variable inside of your `.env`
-file from `file` to any of the ones mentioned earlier.
+`file`, `s3`, `r2`, `firebase`. You can specify which one you want to use by
+changing the value of the `STORAGE_STRATEGY` environment variable inside of your
+`.env` file from `file` to any of the ones mentioned earlier.
 
 Some storage strategies require additional configuration.
 
@@ -126,16 +126,24 @@ environment variable. This path is relative to the root of the project.
 You need to specify the auth credentials, as well as the endpoint and the S3
 bucket name using the `S3_*` environment variables.
 
+### R2StorageStrategy
+
+fastbin now supports Cloudflare R2. Set the storage strategy to `r2` and
+configure the environment variables starting with `R2_`.
+
 ### FirebaseStorageStrategy
 
 You need to specify the name of the Firebase Storage bucket\* inside of the
 `FIREBASE_BUCKET` property of the config. You should also include your Firebase
-credentials certificate in `.firebase/credentials.json` (or as an environment
-variable, using `FIREBASE_SERVICE_ACCOUNT`). This step is cruial. If you don't
-have a credentials JSON file yet, you can generate one in the settings of your
-Firebase projects.
+credentials certificate in the `FIREBASE_SERVICE_ACCOUNT` environment variable.
 
 \*Make sure you only specify the bucket's name, WITHOUT ".appspot.com".
+
+## BREAKING CHANGES IN v3
+
+- The environment variables for the S3 storage strategy have been changed;
+- Specifying the service account for the Firebase storage strategy is now only
+possible through the `FIREBASE_SERVICE_ACCOUNT` environment variable.
 
 ## Contribution
 
