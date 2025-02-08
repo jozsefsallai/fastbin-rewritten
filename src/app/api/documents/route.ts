@@ -2,6 +2,7 @@ import { env } from "@/lib/env";
 import { encrypt } from "@/lib/secrets";
 import { getStorageStrategy } from "@/lib/storageStrategies";
 import { init as initCuid } from "@paralleldrive/cuid2";
+import type { NextRequest } from "next/server";
 
 const storage = getStorageStrategy();
 
@@ -9,7 +10,7 @@ const createId = initCuid({
   length: 8,
 });
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const contents =
     req.headers.get("Content-Type") === "application/json"
       ? Object.keys(await req.json())[0]
@@ -37,6 +38,10 @@ export async function POST(req: Request) {
     );
   }
 
+  const ip = (
+    req.headers.get("CF-Connecting-IP") || req.headers.get("x-forwarded-for")
+  )?.split(",")[0];
+
   try {
     let key: string | null = null;
 
@@ -44,7 +49,7 @@ export async function POST(req: Request) {
       key = createId();
     } while (await storage.exists(key));
 
-    await storage.create({ key, data: contents });
+    await storage.create({ key, data: contents, metadata: { ip } });
 
     const secret = encrypt("id", key);
 

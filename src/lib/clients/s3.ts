@@ -72,6 +72,7 @@ export class S3 {
       Bucket: this.bucket,
       Key: opts.key,
       ContentType: opts.mimeType,
+      Metadata: opts.metadata,
     });
 
     return data;

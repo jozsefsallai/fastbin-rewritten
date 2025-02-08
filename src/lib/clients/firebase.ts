@@ -31,9 +31,11 @@ export class Firebase {
       .then((data) => data[0]);
   }
 
-  async upload(key: string, contents: string) {
+  async upload(key: string, contents: string, metadata?: Record<string, any>) {
     const file = this.storage.file(key);
-    return file.save(contents);
+    return file.save(contents, {
+      metadata,
+    });
   }
 
   getStream(key: string) {

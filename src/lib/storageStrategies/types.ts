@@ -32,6 +32,7 @@ export type ICreateFileOptions = {
   data: Buffer | string;
   mimeType?: string;
   isPublic?: boolean;
+  metadata?: Record<string, any>;
 };
 
 export interface IStorageStrategy {
