@@ -49,6 +49,12 @@ Every URL is unlisted, but again, available for the public. Snippets are NOT
 encrypted (i.e. they're plaintext). If there's popular demand for snippet
 encryption, I'll make sure to include that.
 
+## Abuse Report
+
+If you find any content that violates your or someone else's rights, privacy, or
+is otherwise abusive or illegal, please report it to the maintainer of the
+fastbin server you're using via the following email: **[ABUSE_REPORT_EMAIL]**.
+
 ## Self Hosting
 
 ### One-Click Deployment with Vercel

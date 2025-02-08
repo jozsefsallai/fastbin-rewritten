@@ -33,6 +33,8 @@ export const env = createEnv({
     R2_PUBLIC_BASE_URL: z.string().optional(),
 
     SERVER_SECRET: z.string().length(32),
+
+    ABUSE_REPORT_EMAIL: z.string().email().optional(),
   },
 
   client: {

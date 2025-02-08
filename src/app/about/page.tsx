@@ -1,4 +1,5 @@
 import { EditorView } from "@/components/editor/editor-view";
+import { env } from "@/lib/env";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
@@ -13,6 +14,10 @@ export default async function AboutPage() {
   readme = readme.replace(
     '<a href="https://app.netlify.com/start/deploy?repository=https://github.com/jozsefsallai/fastbin-rewritten"><img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify" /></a>',
     "https://app.netlify.com/start/deploy?repository=https://github.com/jozsefsallai/fastbin-rewritten",
+  );
+  readme = readme.replace(
+    "[ABUSE_REPORT_EMAIL]",
+    env.ABUSE_REPORT_EMAIL ?? "[EMAIL NOT PROVIDED]",
   );
 
   return <EditorView contents={readme} languageId="markdown" readOnly />;
