@@ -2,6 +2,7 @@ import { EditorView } from "@/components/editor/editor-view";
 import { languages } from "@/lib/languages";
 import { getDocument } from "@/lib/server/getDocument";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function ClonePage({
   params,
@@ -31,6 +32,11 @@ export default async function ClonePage({
   }
 
   return (
-    <EditorView contents={document.toString("utf-8")} languageId={languageId} />
+    <Suspense>
+      <EditorView
+        contents={document.toString("utf-8")}
+        languageId={languageId}
+      />
+    </Suspense>
   );
 }

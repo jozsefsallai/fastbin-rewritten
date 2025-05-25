@@ -2,6 +2,7 @@ import { EditorView } from "@/components/editor/editor-view";
 import { env } from "@/lib/env";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import { Suspense } from "react";
 
 export default async function AboutPage() {
   const readmePath = path.join(process.cwd(), "README.md");
@@ -20,5 +21,9 @@ export default async function AboutPage() {
     env.ABUSE_REPORT_EMAIL ?? "[EMAIL NOT PROVIDED]",
   );
 
-  return <EditorView contents={readme} languageId="markdown" readOnly />;
+  return (
+    <Suspense>
+      <EditorView contents={readme} languageId="markdown" readOnly />
+    </Suspense>
+  );
 }

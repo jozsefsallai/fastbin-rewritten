@@ -1,6 +1,7 @@
 "use client";
 
 import { EditorView } from "@/components/editor/editor-view";
+import { Suspense } from "react";
 
 const ERROR_PAGE = `# Error 404
 
@@ -12,5 +13,9 @@ contact me on GitHub: https://github.com/jozsefsallai
 `;
 
 export default function NotFound() {
-  return <EditorView contents={ERROR_PAGE} languageId="markdown" readOnly />;
+  return (
+    <Suspense>
+      <EditorView contents={ERROR_PAGE} languageId="markdown" readOnly />
+    </Suspense>
+  );
 }
