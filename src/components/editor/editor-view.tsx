@@ -3,7 +3,7 @@
 import { TheHeader, type NavigationItem } from "@/components/common/the-header";
 import upload from "@/lib/upload";
 import { Code, Copy, Save, Trash } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -34,6 +34,7 @@ export function EditorView({
   const [isUploading, setIsUploading] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useHotkeys("ctrl+s", save, {
     enabled: !readOnly,
@@ -146,6 +147,14 @@ export function EditorView({
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [readOnly]);
+
+  useEffect(() => {
+    if (!snippetKey || !searchParams.has("secret")) {
+      return;
+    }
+
+    window.history.replaceState(null, "", `/${snippetKey}`);
+  }, [snippetKey, searchParams]);
 
   return (
     <main>
