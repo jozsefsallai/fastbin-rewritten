@@ -1,12 +1,12 @@
-import {
-  type PutObjectCommandOutput,
-  S3 as S3Client,
-} from "@aws-sdk/client-s3";
 import type { Readable } from "node:stream";
 import type {
   ICreateFileOptions,
   S3Credentials,
 } from "@/lib/storageStrategies/types";
+import {
+  type PutObjectCommandOutput,
+  S3 as S3Client,
+} from "@aws-sdk/client-s3";
 
 export class S3 {
   private s3: S3Client;
@@ -78,29 +78,60 @@ export class S3 {
     return data;
   }
 
-  async getStream(key: string) {
+  async getStream(key: string): Promise<Readable | null> {
     const params = {
       Bucket: this.bucket,
       Key: key,
     };
 
-    const data = await this.s3.getObject(params);
-    return data.Body as Readable;
+    try {
+      const data = await this.s3.getObject(params);
+      return data.Body as Readable;
+    } catch (err: unknown) {
+      if (this.isNotFound(err)) {
+        return null;
+      }
+      throw err;
+    }
   }
 
-  async read(key: string): Promise<Buffer> {
+  async read(key: string): Promise<Buffer | null> {
     const params = {
       Bucket: this.bucket,
       Key: key,
     };
 
-    const data = await this.s3.getObject(params);
-    const bytes = await data.Body?.transformToByteArray();
+    try {
+      const data = await this.s3.getObject(params);
+      const bytes = await data.Body?.transformToByteArray();
 
-    if (!bytes) {
-      throw new Error("Failed to read file from S3");
+      if (!bytes) {
+        return null;
+      }
+
+      return Buffer.from(bytes);
+    } catch (err: unknown) {
+      if (this.isNotFound(err)) {
+        return null;
+      }
+      throw err;
     }
+  }
 
-    return Buffer.from(bytes);
+  private isNotFound(err: unknown): boolean {
+    if (!err || typeof err !== "object") {
+      return false;
+    }
+    const e = err as {
+      name?: string;
+      Code?: string;
+      $metadata?: { httpStatusCode?: number };
+    };
+    return (
+      e.name === "NotFound" ||
+      e.name === "NoSuchKey" ||
+      e.Code === "NoSuchKey" ||
+      e.$metadata?.httpStatusCode === 404
+    );
   }
 }

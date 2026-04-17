@@ -1,5 +1,5 @@
-import type { Env } from "@/lib/env";
 import type { Readable } from "node:stream";
+import type { Env } from "@/lib/env";
 
 export type S3Credentials = {
   accessKeyId: string;
@@ -37,8 +37,8 @@ export type ICreateFileOptions = {
 
 export interface IStorageStrategy {
   create(params: ICreateFileOptions): Promise<void>;
-  get(key: string): Promise<Buffer>;
-  getStream(key: string): Promise<Readable>;
+  get(key: string): Promise<Buffer | null>;
+  getStream(key: string): Promise<Readable | null>;
   exists(key: string): Promise<boolean>;
   delete(key: string): Promise<boolean>;
 }

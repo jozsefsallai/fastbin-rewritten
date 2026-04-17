@@ -11,10 +11,21 @@ const createId = initCuid({
 });
 
 export async function POST(req: NextRequest) {
-  const contents =
-    req.headers.get("Content-Type") === "application/json"
-      ? Object.keys(await req.json())[0]
-      : await req.text();
+  const contentType = req.headers.get("Content-Type") ?? "";
+  let contents: string;
+
+  if (contentType.includes("application/json")) {
+    const body = (await req.json()) as { contents?: unknown };
+    if (typeof body.contents !== "string") {
+      return Response.json(
+        { ok: false, error: "Expected JSON body { contents: string }." },
+        { status: 400 },
+      );
+    }
+    contents = body.contents;
+  } else {
+    contents = await req.text();
+  }
 
   if (!contents || contents.length === 0) {
     return Response.json(
@@ -43,11 +54,19 @@ export async function POST(req: NextRequest) {
   )?.split(",")[0];
 
   try {
-    let key: string | null = null;
+    let key = createId();
+    let attempts = 0;
+    const maxKeyAttempts = 24;
 
-    do {
+    while (await storage.exists(key)) {
       key = createId();
-    } while (await storage.exists(key));
+      if (++attempts > maxKeyAttempts) {
+        return Response.json(
+          { ok: false, error: "Failed to allocate a unique snippet id." },
+          { status: 500 },
+        );
+      }
+    }
 
     await storage.create({ key, data: contents, metadata: { ip } });
 

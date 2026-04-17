@@ -1,3 +1,4 @@
+import type { Readable } from "node:stream";
 import { Firebase } from "@/lib/clients/firebase";
 import { type Env, env } from "@/lib/env";
 import type {
@@ -28,13 +29,32 @@ export class FirebaseStorageStrategy implements IStorageStrategy {
     await this.firebase.upload(opts.key, opts.data.toString());
   }
 
-  async get(key: string): Promise<Buffer> {
-    const contents = await this.firebase.read(key);
-    return Buffer.from(contents);
+  async get(key: string): Promise<Buffer | null> {
+    try {
+      const contents = await this.firebase.read(key);
+      return Buffer.from(contents);
+    } catch (err: unknown) {
+      if (this.isNotFound(err)) {
+        return null;
+      }
+      throw err;
+    }
   }
 
-  async getStream(key: string) {
+  async getStream(key: string): Promise<Readable | null> {
+    const exists = await this.firebase.exists(key);
+    if (!exists) {
+      return null;
+    }
     return this.firebase.getStream(key);
+  }
+
+  private isNotFound(err: unknown): boolean {
+    if (!err || typeof err !== "object") {
+      return false;
+    }
+    const e = err as { code?: number | string };
+    return e.code === 404 || e.code === "404";
   }
 
   private static getFirebaseCredentials(): FirebaseCredentials {

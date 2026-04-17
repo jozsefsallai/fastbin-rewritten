@@ -1,15 +1,14 @@
 "use client";
 
-import { TheHeader, type NavigationItem } from "@/components/common/the-header";
+import { type NavigationItem, TheHeader } from "@/components/common/the-header";
 import upload from "@/lib/upload";
 import { Code, Copy, Save, Trash } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { useHotkeys } from "react-hotkeys-hook";
 import { Editor } from "@/components/editor/editor";
-import { LoadingContainer } from "@/components/common/loading-container";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export type EditorViewProps = {
   contents?: string;
@@ -31,13 +30,64 @@ export function EditorView({
 
   const documentContents = useRef(contents ?? "");
 
-  const [isUploading, setIsUploading] = useState(false);
+  const [persistedKey, setPersistedKey] = useState<string | null>(null);
+  const [persistedSecret, setPersistedSecret] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const isSavingRef = useRef(false);
+  const hasCreatedSnippetRef = useRef(false);
+
+  const [hasDraftContent, setHasDraftContent] = useState(
+    () => (contents?.length ?? 0) > 0,
+  );
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const effectiveSnippetKey = snippetKey ?? persistedKey ?? "";
+  const effectiveDeleteToken = deleteToken ?? persistedSecret ?? undefined;
+  const effectiveReadOnly = readOnly || persistedKey !== null;
+
+  const save = useCallback(async () => {
+    if (isSavingRef.current || readOnly || hasCreatedSnippetRef.current) {
+      return;
+    }
+
+    isSavingRef.current = true;
+    setIsSaving(true);
+
+    try {
+      const {
+        key: displayKey,
+        storageKey,
+        secret,
+      } = await upload(documentContents.current, documentLanguageRef.current);
+
+      hasCreatedSnippetRef.current = true;
+      setPersistedKey(storageKey);
+      setPersistedSecret(secret);
+
+      window.history.replaceState(null, "", `/${storageKey}`);
+
+      const copyUrl = `${window.location.origin}/${displayKey}`;
+      toast.success("Snippet created", {
+        duration: Number.POSITIVE_INFINITY,
+        description: copyUrl,
+        action: {
+          label: "Copy URL",
+          onClick: () => void navigator.clipboard.writeText(copyUrl),
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error(`Failed to create snippet. Error: ${err}`);
+    } finally {
+      isSavingRef.current = false;
+      setIsSaving(false);
+    }
+  }, [readOnly]);
+
   useHotkeys("ctrl+s", save, {
-    enabled: !readOnly,
+    enabled: !effectiveReadOnly,
     enableOnFormTags: true,
     enableOnContentEditable: true,
     preventDefault: true,
@@ -49,15 +99,19 @@ export function EditorView({
     preventDefault: true,
   });
 
-  useHotkeys("ctrl+shift+c", () => router.push(`/clone/${snippetKey}`), {
-    enabled: !!snippetKey,
-    enableOnFormTags: true,
-    enableOnContentEditable: true,
-    preventDefault: true,
-  });
+  useHotkeys(
+    "ctrl+shift+c",
+    () => router.push(`/clone/${effectiveSnippetKey}`),
+    {
+      enabled: !!effectiveSnippetKey,
+      enableOnFormTags: true,
+      enableOnContentEditable: true,
+      preventDefault: true,
+    },
+  );
 
-  useHotkeys("ctrl+shift+r", () => router.push(`/raw/${snippetKey}`), {
-    enabled: !!snippetKey,
+  useHotkeys("ctrl+shift+r", () => router.push(`/raw/${effectiveSnippetKey}`), {
+    enabled: !!effectiveSnippetKey,
     enableOnFormTags: true,
     enableOnContentEditable: true,
     preventDefault: true,
@@ -68,76 +122,66 @@ export function EditorView({
     _setDocumentLanguage(language);
   }
 
-  function setDocumentContents(contents: string) {
-    documentContents.current = contents;
-  }
-
-  async function save() {
-    if (isUploading) {
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      const { key, secret } = await upload(
-        documentContents.current,
-        documentLanguageRef.current,
-      );
-
-      toast.success("Snippet created successfully! Redirecting...");
-      router.push(`/${key}?secret=${secret}`);
-    } catch (err) {
-      console.error(err);
-      setIsUploading(false);
-      toast.error(`Failed to create snippet. Error: ${err}`);
-    }
+  function setDocumentContents(next: string) {
+    documentContents.current = next;
+    setHasDraftContent(next.length > 0);
   }
 
   const navigation: NavigationItem[] = [
-    ...(!readOnly
+    ...(!readOnly && persistedKey === null
       ? [
           {
             tooltip: "Save (ctrl+s)",
             icon: <Save />,
             onClick: save,
+            pending: isSaving,
           },
         ]
       : []),
 
-    ...(snippetKey
+    ...(effectiveSnippetKey
       ? [
           {
             tooltip: "Clone (ctrl+shift+c)",
             icon: <Copy />,
-            url: `/clone/${snippetKey}`,
+            url: `/clone/${effectiveSnippetKey}`,
           },
           {
             tooltip: "Raw (ctrl+shift+r)",
             icon: <Code />,
-            url: `/raw/${snippetKey}`,
+            url: `/raw/${effectiveSnippetKey}`,
             external: true,
           },
         ]
       : []),
 
-    ...(deleteToken
+    ...(effectiveDeleteToken
       ? [
           {
             tooltip: "Delete",
             icon: <Trash />,
-            url: `/delete/${deleteToken}`,
+            url: `/delete/${effectiveDeleteToken}`,
           },
         ]
       : []),
   ];
 
   useEffect(() => {
-    if (readOnly) {
+    setHasDraftContent((contents?.length ?? 0) > 0);
+  }, [contents]);
+
+  useEffect(() => {
+    if (effectiveReadOnly) {
       return;
     }
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isSavingRef.current) {
+        return;
+      }
+      if (!hasDraftContent) {
+        return;
+      }
       event.preventDefault();
     };
 
@@ -146,7 +190,7 @@ export function EditorView({
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [readOnly]);
+  }, [effectiveReadOnly, hasDraftContent]);
 
   useEffect(() => {
     if (!snippetKey || !searchParams.has("secret")) {
@@ -156,8 +200,10 @@ export function EditorView({
     window.history.replaceState(null, "", `/${snippetKey}`);
   }, [snippetKey, searchParams]);
 
+  const showEmptyHint = !effectiveReadOnly && !hasDraftContent;
+
   return (
-    <main>
+    <main className="relative min-h-dvh">
       <TheHeader
         items={navigation}
         displayLanguages
@@ -165,16 +211,33 @@ export function EditorView({
         setDocumentLanguage={setDocumentLanguage}
       />
 
-      {!isUploading && (
+      <div>
+        {showEmptyHint && (
+          <div
+            className="editor pointer-events-none z-20 flex items-center justify-center bg-transparent p-8 text-center text-muted-foreground/80"
+            aria-hidden
+          >
+            <p className="max-w-sm text-sm leading-relaxed md:text-base">
+              Start typing…{" "}
+              <kbd className="rounded border bg-muted/80 px-1.5 py-0.5 font-mono text-xs">
+                Ctrl+S
+              </kbd>{" "}
+              to save,{" "}
+              <kbd className="rounded border bg-muted/80 px-1.5 py-0.5 font-mono text-xs">
+                Ctrl+I
+              </kbd>{" "}
+              for a new snippet.
+            </p>
+          </div>
+        )}
+
         <Editor
           contents={contents}
           language={documentLanguage}
           setContents={setDocumentContents}
-          readOnly={readOnly}
+          readOnly={effectiveReadOnly}
         />
-      )}
-
-      {isUploading && <LoadingContainer />}
+      </div>
     </main>
   );
 }

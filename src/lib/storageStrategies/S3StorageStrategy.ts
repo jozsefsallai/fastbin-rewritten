@@ -1,11 +1,11 @@
 import type { Readable } from "node:stream";
 import { S3 } from "@/lib/clients/s3";
+import { type Env, env } from "@/lib/env";
 import type {
-  IStorageStrategy,
   ICreateFileOptions,
+  IStorageStrategy,
   S3Credentials,
 } from "@/lib/storageStrategies/types";
-import { env, type Env } from "@/lib/env";
 
 export class S3StorageStrategy<T extends S3> implements IStorageStrategy {
   private s3: T;
@@ -36,12 +36,13 @@ export class S3StorageStrategy<T extends S3> implements IStorageStrategy {
     await this.s3.upload(finalOpts);
   }
 
-  async getStream(key: string): Promise<Readable> {
+  async getStream(key: string): Promise<Readable | null> {
     this.ensureClientExists();
     return this.s3.getStream(key);
   }
 
-  async get(key: string): Promise<Buffer> {
+  async get(key: string): Promise<Buffer | null> {
+    this.ensureClientExists();
     return this.s3.read(key);
   }
 

@@ -1,64 +1,36 @@
 "use client";
 
-import { Editor as MonacoEditor } from "@monaco-editor/react";
-import checkMobile from "ismobilejs";
+import { LoadingContainer } from "@/components/common/loading-container";
+import type { EditorProps } from "@/components/editor/editor-types";
 import { MobileEditor } from "@/components/editor/mobile-editor";
+import checkMobile from "ismobilejs";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
-import { initializeMonaco } from "@/lib/monaco";
 
-export type EditorProps = {
-  contents?: string;
-  readOnly?: boolean;
-  language: string;
-  setContents?(contents: string): void | Promise<void>;
-};
+const MonacoEditorPanel = dynamic(
+  () =>
+    import("@/components/editor/monaco-editor-panel").then(
+      (m) => m.MonacoEditorPanel,
+    ),
+  {
+    ssr: false,
+    loading: () => <LoadingContainer />,
+  },
+);
 
-export function Editor({
-  contents,
-  readOnly,
-  language,
-  setContents,
-}: EditorProps) {
+export type { EditorProps } from "@/components/editor/editor-types";
+
+export function Editor(props: EditorProps) {
   const [isMobile, setIsMobile] = useState(false);
-
-  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const _isMobile = checkMobile(window.navigator).any;
     setIsMobile(_isMobile);
   }, []);
 
-  function handleEditorChange(value: string | undefined) {
-    setContents?.(value ?? "");
-  }
-
   if (isMobile) {
-    return (
-      <MobileEditor
-        contents={contents}
-        readOnly={readOnly}
-        setContents={setContents}
-      />
-    );
+    return <MobileEditor {...props} />;
   }
 
-  return (
-    <MonacoEditor
-      language={language}
-      value={contents}
-      onChange={handleEditorChange}
-      theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
-      className="editor"
-      options={{
-        fontFamily: "var(--font-geist-mono)",
-        fontLigatures: true,
-        lineHeight: 22,
-        readOnly,
-      }}
-      onMount={(_editor, monaco) => {
-        initializeMonaco(monaco);
-      }}
-    />
-  );
+  return <MonacoEditorPanel {...props} />;
 }

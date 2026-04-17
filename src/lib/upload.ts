@@ -1,7 +1,10 @@
 import { languages } from "./languages";
 
-interface KeyAndSecret {
+export interface UploadResult {
+  /** URL path segment (may include a file extension for syntax highlighting). */
   key: string;
+  /** Storage id without extension (same as API `key`). */
+  storageKey: string;
   secret: string;
 }
 
@@ -24,7 +27,7 @@ const getKeyWithExtension = (key: string, languageId: string): string => {
 const upload = (
   contents: string,
   languageId: string,
-): Promise<KeyAndSecret> => {
+): Promise<UploadResult> => {
   return new Promise((resolve, reject) => {
     if (!contents.length) {
       return reject("Contents is too short.");
@@ -45,9 +48,11 @@ const upload = (
           return reject(json.error);
         }
 
-        const key = getKeyWithExtension(json.key, languageId);
+        const storageKey = json.key as string;
+        const key = getKeyWithExtension(storageKey, languageId);
         return resolve({
           key,
+          storageKey,
           secret: json.secret,
         });
       })
