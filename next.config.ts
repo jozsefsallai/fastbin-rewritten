@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Not entirely sure why this is needed now, but okay
+  outputFileTracingExcludes: {
+    "*": ["**/.pnpm-store/**", "**/node_modules/.pnpm-store/**", "**/.git/**"],
+  },
   async rewrites() {
     return [
       {
