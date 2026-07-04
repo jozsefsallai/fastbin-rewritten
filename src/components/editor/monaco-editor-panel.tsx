@@ -1,7 +1,7 @@
 "use client";
 
 import type { EditorProps } from "@/components/editor/editor-types";
-import { initializeMonaco } from "@/lib/monaco";
+import { initializeMonaco, registerEditorActions } from "@/lib/monaco";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import { useTheme } from "next-themes";
 
@@ -30,8 +30,9 @@ export function MonacoEditorPanel({
         lineHeight: 22,
         readOnly,
       }}
-      onMount={(_editor, monaco) => {
+      onMount={(editor, monaco) => {
         initializeMonaco(monaco);
+        registerEditorActions(editor, monaco);
       }}
     />
   );

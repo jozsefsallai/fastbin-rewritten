@@ -1,4 +1,5 @@
 import type { Monaco } from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
 
 export function initializeMonaco(monaco: Monaco) {
   // add Cave Story TSC support
@@ -26,5 +27,20 @@ export function initializeMonaco(monaco: Monaco) {
     noSemanticValidation: true,
     noSyntaxValidation: true,
     noSuggestionDiagnostics: true,
+  });
+}
+
+export function registerEditorActions(
+  editorInstance: editor.IStandaloneCodeEditor,
+  monaco: Monaco,
+) {
+  editorInstance.addAction({
+    id: "fastbin.toggleWordWrap",
+    label: "Toggle Word Wrap",
+    keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.KeyZ],
+    run: (ed) => {
+      const wordWrap = ed.getOption(monaco.editor.EditorOption.wordWrap);
+      ed.updateOptions({ wordWrap: wordWrap === "on" ? "off" : "on" });
+    },
   });
 }
