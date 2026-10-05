@@ -36,7 +36,6 @@ export async function verifyCaptcha(
   }
 
   if (!token) {
-    console.warn("[captcha] Verification failed: request is missing a token.");
     return false;
   }
 
@@ -51,13 +50,6 @@ export async function verifyCaptcha(
   }
 
   try {
-    console.log("[captcha] Verifying token with hCaptcha siteverify.", {
-      sitekey: env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY,
-      secretLength: (env.HCAPTCHA_SECRET as string).length,
-      secretPrefix: (env.HCAPTCHA_SECRET as string).slice(0, 4),
-      remoteIp: remoteIp ?? null,
-      tokenLength: token.length,
-    });
 
     const response = await fetch("https://api.hcaptcha.com/siteverify", {
       method: "POST",
@@ -67,13 +59,6 @@ export async function verifyCaptcha(
     });
 
     if (!response.ok) {
-      console.error(
-        "[captcha] hCaptcha siteverify responded with a non-OK status.",
-        {
-          status: response.status,
-          statusText: response.statusText,
-        },
-      );
       return false;
     }
 
@@ -89,10 +74,6 @@ export async function verifyCaptcha(
       return false;
     }
 
-    console.log("[captcha] hCaptcha verification succeeded.", {
-      hostname: data.hostname ?? null,
-      challengeTs: data.challenge_ts ?? null,
-    });
     return true;
   } catch (err) {
     console.error("[captcha] Failed to verify hCaptcha token.", err);

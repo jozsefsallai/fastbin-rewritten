@@ -34,12 +34,6 @@ const upload = (
       return reject("Contents is too short.");
     }
 
-    console.log("[captcha] Uploading snippet.", {
-      hasCaptchaToken: Boolean(captchaToken),
-      languageId,
-      length: contents.length,
-    });
-
     return fetch("/api/documents", {
       method: "POST",
       headers: {
@@ -52,7 +46,7 @@ const upload = (
     })
       .then((res) => {
         if (!res.ok) {
-          console.warn("[captcha] Upload request returned a non-OK status.", {
+          console.warn("[upload] Upload request returned a non-OK status.", {
             status: res.status,
             hasCaptchaToken: Boolean(captchaToken),
           });

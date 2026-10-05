@@ -17,18 +17,11 @@ export async function POST(req: NextRequest) {
   )?.split(",")[0];
 
   const captchaToken = req.headers.get("x-hcaptcha-token");
-  console.log("[documents] Upload request received.", {
-    hasCaptchaToken: Boolean(captchaToken),
-    ip: ip ?? null,
-  });
+
 
   const captchaValid = await verifyCaptcha(captchaToken, ip);
 
   if (!captchaValid) {
-    console.warn("[documents] Rejecting upload: captcha verification failed.", {
-      hasCaptchaToken: Boolean(captchaToken),
-      ip: ip ?? null,
-    });
     return Response.json(
       {
         ok: false,
