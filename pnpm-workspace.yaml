@@ -1,4 +1,0 @@
-allowBuilds:
-  '@biomejs/biome': true
-  protobufjs: true
-  sharp: true
