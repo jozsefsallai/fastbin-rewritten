@@ -1,6 +1,8 @@
 "use client";
 
 import { type NavigationItem, TheHeader } from "@/components/common/the-header";
+import { CaptchaDialog } from "@/components/common/captcha-dialog";
+import { hCaptchaSiteKey, isCaptchaEnabled } from "@/lib/captcha";
 import upload from "@/lib/upload";
 import { Code, Copy, Save, Trash } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -35,6 +37,7 @@ export function EditorView({
   const [isSaving, setIsSaving] = useState(false);
   const isSavingRef = useRef(false);
   const hasCreatedSnippetRef = useRef(false);
+  const [isCaptchaOpen, setIsCaptchaOpen] = useState(false);
 
   const [hasDraftContent, setHasDraftContent] = useState(
     () => (contents?.length ?? 0) > 0,
@@ -47,44 +50,66 @@ export function EditorView({
   const effectiveDeleteToken = deleteToken ?? persistedSecret ?? undefined;
   const effectiveReadOnly = readOnly || persistedKey !== null;
 
+  const runUpload = useCallback(
+    async (captchaToken?: string) => {
+      if (isSavingRef.current || readOnly || hasCreatedSnippetRef.current) {
+        return;
+      }
+
+      isSavingRef.current = true;
+      setIsSaving(true);
+
+      try {
+        const {
+          key: displayKey,
+          storageKey,
+          secret,
+        } = await upload(
+          documentContents.current,
+          documentLanguageRef.current,
+          captchaToken,
+        );
+
+        hasCreatedSnippetRef.current = true;
+        setPersistedKey(storageKey);
+        setPersistedSecret(secret);
+
+        window.history.replaceState(null, "", `/${storageKey}`);
+
+        const copyUrl = `${window.location.origin}/${displayKey}`;
+        toast.success("Snippet created", {
+          duration: Number.POSITIVE_INFINITY,
+          description: copyUrl,
+          action: {
+            label: "Copy URL",
+            onClick: () => void navigator.clipboard.writeText(copyUrl),
+          },
+        });
+      } catch (err) {
+        console.error(err);
+        toast.error(`Failed to create snippet. Error: ${err}`);
+      } finally {
+        isSavingRef.current = false;
+        setIsSaving(false);
+      }
+    },
+    [readOnly],
+  );
+
   const save = useCallback(async () => {
     if (isSavingRef.current || readOnly || hasCreatedSnippetRef.current) {
       return;
     }
 
-    isSavingRef.current = true;
-    setIsSaving(true);
-
-    try {
-      const {
-        key: displayKey,
-        storageKey,
-        secret,
-      } = await upload(documentContents.current, documentLanguageRef.current);
-
-      hasCreatedSnippetRef.current = true;
-      setPersistedKey(storageKey);
-      setPersistedSecret(secret);
-
-      window.history.replaceState(null, "", `/${storageKey}`);
-
-      const copyUrl = `${window.location.origin}/${displayKey}`;
-      toast.success("Snippet created", {
-        duration: Number.POSITIVE_INFINITY,
-        description: copyUrl,
-        action: {
-          label: "Copy URL",
-          onClick: () => void navigator.clipboard.writeText(copyUrl),
-        },
-      });
-    } catch (err) {
-      console.error(err);
-      toast.error(`Failed to create snippet. Error: ${err}`);
-    } finally {
-      isSavingRef.current = false;
-      setIsSaving(false);
+    if (isCaptchaEnabled) {
+      console.log("[captcha] Captcha is enabled; opening challenge dialog.");
+      setIsCaptchaOpen(true);
+      return;
     }
-  }, [readOnly]);
+
+    console.log("[captcha] Captcha is disabled; uploading directly.");
+    await runUpload();
+  }, [readOnly, runUpload]);
 
   useHotkeys("ctrl+s", save, {
     enabled: !effectiveReadOnly,
@@ -238,6 +263,18 @@ export function EditorView({
           readOnly={effectiveReadOnly}
         />
       </div>
+
+      {hCaptchaSiteKey && (
+        <CaptchaDialog
+          open={isCaptchaOpen}
+          siteKey={hCaptchaSiteKey}
+          onOpenChange={setIsCaptchaOpen}
+          onVerify={(token) => {
+            setIsCaptchaOpen(false);
+            void runUpload(token);
+          }}
+        />
+      )}
     </main>
   );
 }

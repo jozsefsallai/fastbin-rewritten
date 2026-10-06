@@ -6,7 +6,7 @@ export const env = createEnv({
   emptyStringAsUndefined: true,
 
   server: {
-    STORAGE_STRATEGY: z.enum(["file", "s3", "firebase", "r2"]),
+    STORAGE_STRATEGY: z.enum(["file", "s3", "firebase", "r2", "vercel-blob"]),
 
     LIMITS_MAX_BODY_LENGTH: z
       .string()
@@ -32,6 +32,11 @@ export const env = createEnv({
     R2_BUCKET_NAME: z.string().optional(),
     R2_PUBLIC_BASE_URL: z.string().optional(),
 
+    BLOB_READ_WRITE_TOKEN: z.string().optional(),
+    BLOB_ACCESS: z.enum(["public", "private"]).optional(),
+
+    HCAPTCHA_SECRET: z.string().optional(),
+
     SERVER_SECRET: z.string().length(32),
 
     ABUSE_REPORT_EMAIL: z.string().email().optional(),
@@ -39,10 +44,12 @@ export const env = createEnv({
 
   client: {
     NEXT_PUBLIC_SITE_URL: z.string().url(),
+    NEXT_PUBLIC_HCAPTCHA_SITE_KEY: z.string().optional(),
   },
 
   experimental__runtimeEnv: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_HCAPTCHA_SITE_KEY: process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY,
   },
 });
 

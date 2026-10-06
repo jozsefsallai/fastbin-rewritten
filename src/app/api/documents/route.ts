@@ -1,5 +1,6 @@
 import { env } from "@/lib/env";
 import { encrypt } from "@/lib/secrets";
+import { verifyCaptcha } from "@/lib/server/verifyCaptcha";
 import { getStorageStrategy } from "@/lib/storageStrategies";
 import { init as initCuid } from "@paralleldrive/cuid2";
 import type { NextRequest } from "next/server";
@@ -11,6 +12,25 @@ const createId = initCuid({
 });
 
 export async function POST(req: NextRequest) {
+  const ip = (
+    req.headers.get("CF-Connecting-IP") || req.headers.get("x-forwarded-for")
+  )?.split(",")[0];
+
+  const captchaToken = req.headers.get("x-hcaptcha-token");
+
+
+  const captchaValid = await verifyCaptcha(captchaToken, ip);
+
+  if (!captchaValid) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Captcha verification failed. Please try again.",
+      },
+      { status: 403 },
+    );
+  }
+
   const contentType = req.headers.get("Content-Type") ?? "";
   let contents: string;
 
@@ -48,10 +68,6 @@ export async function POST(req: NextRequest) {
       { status: 422 },
     );
   }
-
-  const ip = (
-    req.headers.get("CF-Connecting-IP") || req.headers.get("x-forwarded-for")
-  )?.split(",")[0];
 
   try {
     let key = createId();

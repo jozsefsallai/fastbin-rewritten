@@ -115,10 +115,10 @@ yarn start
 
 ## Storage Strategies
 
-At the moment, fastbin can store snippets using three different strategies:
-`file`, `s3`, `r2`, `firebase`. You can specify which one you want to use by
-changing the value of the `STORAGE_STRATEGY` environment variable inside of your
-`.env` file from `file` to any of the ones mentioned earlier.
+At the moment, fastbin can store snippets using 5 different strategies:
+`file`, `s3`, `r2`, `firebase`, `vercel-blob`. You can specify which one you
+want to use by changing the value of the `STORAGE_STRATEGY` environment variable
+inside of your `.env` file from `file` to any of the ones mentioned earlier.
 
 Some storage strategies require additional configuration.
 
@@ -145,11 +145,36 @@ credentials certificate in the `FIREBASE_SERVICE_ACCOUNT` environment variable.
 
 \*Make sure you only specify the bucket's name, WITHOUT ".appspot.com".
 
+### VercelBlobStorageStrategy
+
+fastbin supports [Vercel Blob](https://vercel.com/docs/storage/vercel-blob).
+Set the storage strategy to `vercel-blob` and connect Vercel Blob with `Add a read-write token env var to this connection`.
+
+If your Blob store is configured with **private** access, set `BLOB_ACCESS` to
+`private` so uploads and reads use authenticated access. It defaults to
+`public` for public stores.
+
+## hCaptcha
+
+fastbin can require an [hCaptcha](https://www.hcaptcha.com/) challenge before a
+snippet is saved. This is disabled by default. To enable it, set both:
+
+- `NEXT_PUBLIC_HCAPTCHA_SITE_KEY` – your hCaptcha site key (exposed to the
+  client); and
+- `HCAPTCHA_SECRET` – your hCaptcha secret key (used server-side to verify the
+  token).
+
+When enabled, the server rejects any upload that does not include a valid
+hCaptcha token. Note that this also applies to Haste clients, which cannot solve
+the challenge unless they support sending the `X-HCaptcha-Token` header.
+
 ## BREAKING CHANGES IN v3
 
 - The environment variables for the S3 storage strategy have been changed;
 - Specifying the service account for the Firebase storage strategy is now only
 possible through the `FIREBASE_SERVICE_ACCOUNT` environment variable.
+- [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) supports.
+- You can choose to enable [hCaptcha](https://www.hcaptcha.com) to avoid abuse.
 
 ## Contribution
 
